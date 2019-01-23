@@ -2,6 +2,8 @@ package com.adidas.subscriptionservice.controllers;
 
 import com.adidas.subscriptionservice.exceptions.InvalidSubscriptionException;
 import com.adidas.subscriptionservice.models.Subscription;
+import com.adidas.subscriptionservice.responses.MessageResponse;
+import com.adidas.subscriptionservice.responses.SuscriptionCreatedResponse;
 import com.adidas.subscriptionservice.services.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,7 +44,7 @@ public class SubscriptionController {
     public ResponseEntity saveSubscription(@RequestBody Subscription subscription) {
         try {
             subscription = subscriptionService.saveSubscription(subscription);
-            return ResponseEntity.status(HttpStatus.CREATED).body(subscription.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(new SuscriptionCreatedResponse(subscription.getId()));
         } catch (InvalidSubscriptionException ise) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ise.errorMessages);
         } catch (Exception ex) {
@@ -70,9 +72,9 @@ public class SubscriptionController {
                 subscriptionService.deleteSubscription(subscriptionId);
 
                 logger.info("Subscription : " + subscriptionId + " was deleted successfully");
-                return ResponseEntity.ok("Subscription was deleted successfully");
+                return ResponseEntity.ok(new MessageResponse("The suscription was deleted successfully"));
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Subscription does not exist");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Subscription does not exist"));
             }
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
