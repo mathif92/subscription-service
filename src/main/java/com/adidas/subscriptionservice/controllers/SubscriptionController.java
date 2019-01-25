@@ -3,8 +3,12 @@ package com.adidas.subscriptionservice.controllers;
 import com.adidas.subscriptionservice.exceptions.InvalidSubscriptionException;
 import com.adidas.subscriptionservice.models.Subscription;
 import com.adidas.subscriptionservice.responses.MessageResponse;
-import com.adidas.subscriptionservice.responses.SuscriptionCreatedResponse;
+import com.adidas.subscriptionservice.responses.SubscriptionCreatedResponse;
 import com.adidas.subscriptionservice.services.SubscriptionService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +23,7 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/subscriptions")
+@Api(value="/subscriptions",description="Subscriptions endpoints",produces ="application/json")
 public class SubscriptionController {
 
     private static Logger logger = Logger.getLogger(SubscriptionController.class.getName());
@@ -26,6 +31,13 @@ public class SubscriptionController {
     @Autowired
     SubscriptionService subscriptionService;
 
+    @ApiOperation(value="get subscription",response=ResponseEntity.class)
+    @ApiResponses(value={
+            @ApiResponse(code=200,message="Subscription Retrieved",response=Subscription.class),
+            @ApiResponse(code=500,message="Internal Server Error"),
+            @ApiResponse(code=401,message="Unauthorized"),
+            @ApiResponse(code=404,message="Subscription not found")
+    })
     @GetMapping(value = "/{subscriptionId}", produces = "application/json")
     public ResponseEntity getSubscription(@PathVariable Long subscriptionId) {
         try {
@@ -40,11 +52,18 @@ public class SubscriptionController {
         }
     }
 
+    @ApiOperation(value="create subscription",response=ResponseEntity.class)
+    @ApiResponses(value={
+            @ApiResponse(code=201,message="Subscription Created",response=SubscriptionCreatedResponse.class),
+            @ApiResponse(code=500,message="Internal Server Error"),
+            @ApiResponse(code=401,message="Unauthorized"),
+            @ApiResponse(code=401,message="Bad Request")
+    })
     @PostMapping(value = "", produces = "application/json")
     public ResponseEntity saveSubscription(@RequestBody Subscription subscription) {
         try {
             subscription = subscriptionService.saveSubscription(subscription);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new SuscriptionCreatedResponse(subscription.getId()));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new SubscriptionCreatedResponse(subscription.getId()));
         } catch (InvalidSubscriptionException ise) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ise.errorMessages);
         } catch (Exception ex) {
@@ -52,11 +71,18 @@ public class SubscriptionController {
         }
     }
 
+    @ApiOperation(value="update subscription",response=ResponseEntity.class)
+    @ApiResponses(value={
+            @ApiResponse(code=200,message="Subscription Updated",response=Subscription.class),
+            @ApiResponse(code=500,message="Internal Server Error"),
+            @ApiResponse(code=401,message="Unauthorized"),
+            @ApiResponse(code=401,message="Bad Request")
+    })
     @PutMapping(value = "", produces = "application/json")
     public ResponseEntity fullyUpdateSubscription(@RequestBody Subscription subscription) {
         try {
             subscription = subscriptionService.updateSubscription(subscription);
-            return ResponseEntity.ok(subscription.getId());
+            return ResponseEntity.ok(subscription);
         } catch (InvalidSubscriptionException ise) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ise.errorMessages);
         } catch (Exception ex) {
@@ -64,6 +90,13 @@ public class SubscriptionController {
         }
     }
 
+    @ApiOperation(value="delete subscription",response=ResponseEntity.class)
+    @ApiResponses(value={
+            @ApiResponse(code=200,message="Subscription Deleted",response=MessageResponse.class),
+            @ApiResponse(code=500,message="Internal Server Error"),
+            @ApiResponse(code=401,message="Unauthorized"),
+            @ApiResponse(code=400,message="Bad Request")
+    })
     @DeleteMapping(value = "/{subscriptionId}", produces = "application/json")
     public ResponseEntity fullyUpdateSubscription(@PathVariable Long subscriptionId) {
         try {

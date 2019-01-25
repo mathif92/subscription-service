@@ -7,12 +7,13 @@ else
 fi
 
 if [ "$(docker ps -a | grep subscription-service)" ]; then
-    docker start subscription-service
-else
-    # Generate the application's jar file
-    ./gradlew build
-
-    # Build the docker image using the Dockerfile placed in this folder
-    docker build -t subscription-service:1 --build-arg jar_file=./build/libs/subscription-service-1.0.0.jar .
-    docker run --name subscription-service --link subscription-mysql -p 8080:8080 subscription-service:1
+    docker rm subscription-service
 fi
+
+# Generate the application's jar file
+./gradlew build
+
+# Build the docker image using the Dockerfile placed in this folder
+docker build -t subscription-service:1 --build-arg jar_file=./build/libs/subscription-service-1.0.0.jar .
+docker run --name subscription-service --link subscription-mysql -p 8080:8080 subscription-service:1
+
