@@ -2,7 +2,7 @@ spring:
   application:
     name: subscription-service
   datasource:
-    url: jdbc:mysql://subscription-mysql/subscription?useSSL=false
+    url: jdbc:mysql://subscription-mysql/subscription?useSSL=false&allowPublicKeyRetrieval=true
     username: subscription
     password: subscription
     platform: mysql

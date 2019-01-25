@@ -4,12 +4,14 @@ import com.adidas.subscriptionservice.exceptions.InvalidSubscriptionException;
 import com.adidas.subscriptionservice.models.Subscription;
 import com.adidas.subscriptionservice.repositories.SubscriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * Created by mathias on 22/01/19.
@@ -19,20 +21,39 @@ import java.util.Optional;
 @Service
 public class SubscriptionService {
 
+    private static Logger logger = Logger.getLogger(SubscriptionService.class.getName());
+
     @Autowired
     SubscriptionRepository subscriptionRepository;
+
+    @Autowired
+    @Qualifier("mockEmailClientService")
+    EmailClientService emailClientService;
+
+    @Autowired
+    @Qualifier("mockEventClientService")
+    EventClientService eventClientService;
 
     public Optional<Subscription> getSubscription(Long subscriptionId) {
         return subscriptionRepository.findById(subscriptionId);
     }
 
     public Subscription saveSubscription(Subscription subscription) throws InvalidSubscriptionException {
-        if (Objects.nonNull(subscription.getId())) {
+        if (Objects.nonNull(subscription.getId()) ||
+                Objects.nonNull(subscriptionRepository.findByEmail(subscription.getEmail()))) {
             List<String> errorMessages = new ArrayList<>();
             errorMessages.add("Subscription already exists");
             throw new InvalidSubscriptionException(errorMessages);
         }
         validateSubscription(subscription);
+
+        if (emailClientService.sendEmail(subscription)) {
+            logger.info("Successfully called email service for subscription email : " + subscription.getEmail());
+        }
+
+        if (eventClientService.notifyNewSubscriptionEvent(subscription)) {
+            logger.info("Successfully called event service for subscription email : " + subscription.getEmail());
+        }
 
         return subscriptionRepository.saveAndFlush(subscription);
     }
