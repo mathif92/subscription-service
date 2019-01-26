@@ -16,6 +16,13 @@ Here are the services that are part of the solution architecture :
   <img src="architecture.png" alt="Architecture Diagram">
 </div>
 
+A new architecture is proposed below which adds components to enhance scaling
+ & performance in the solution :
+ 
+<div align="center">
+  <img src="architecture-enhancements.png" alt="Architecture Diagram">
+</div>
+
 ### API Documentation
 
 The subscription service is documented using Swagger 2. It's possible to see

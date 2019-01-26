@@ -1,0 +1,25 @@
+@startuml
+
+node "Subscription Service" {
+    component "subscription-service" <<Spring Boot 2.1.2>> as subscriptionService #Yellow
+    database "Subscriptions Write DB" <<MySQL>> as writeDatabase #Yellow
+    queue "Subscription CreatedTopic" <<SNS/Kafka>> as SubscriptionCreatedTopic
+    database "Subscriptions Read DB" <<Cassandra/Redis/MySQL Replica>> as readDatabase #Yellow
+}
+
+
+node "Events Service" {
+    component "events-service" <<Any>> as eventsService #Yellow
+}
+
+node "Email Service" {
+    component "email-service" <<Any>> as emailService #Yellow
+}
+
+subscriptionService --> writeDatabase
+subscriptionService -up-> eventsService
+subscriptionService -up-> emailService
+subscriptionService --> SubscriptionCreatedTopic
+subscriptionService --> readDatabase
+
+@enduml
