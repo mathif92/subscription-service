@@ -8,6 +8,8 @@ For running the application is needed to have these technologies installed :
 * Docker
 * Gradle
 
+To execute the application it's necessary to run the *run.sh* file.
+
 ### Architecture
 
 Here are the services that are part of the solution architecture :
@@ -80,3 +82,17 @@ up the ELBs correctly so the services can scale according to the load they handl
 
 Unit and functional tests must be added to the service in the future as well as
 configuration for deploying the services on the cloud using Kubernetes.
+
+In the security part of the subscription service, a fixed JWT read from the
+configuration file which is not desirable. In the future a authentication server should be
+provided which will be in charge of the JWT management.
+
+There are two strategies for validating the tokens in the future : 
+
+* Validating the token using a Http Request against the authentication server
+* Verify the token locally on each service by using the public key stored in a Vault
+server accessible from all the services using a public RSA key.
+
+It's preferable to use the second strategy as it avoids a request against the
+authentication server which also would probably need to retrieve the user data from
+the database and generate a JWT based on that data.
