@@ -20,6 +20,7 @@ subscriptionService --> writeDatabase
 subscriptionService -up-> eventsService
 subscriptionService -up-> emailService
 subscriptionService --> SubscriptionCreatedTopic
+SubscriptionCreatedTopic --> subscriptionService
 subscriptionService --> readDatabase
 
 @enduml
