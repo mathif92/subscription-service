@@ -40,15 +40,11 @@ public class SubscriptionController {
     })
     @GetMapping(value = "/{subscriptionId}", produces = "application/json")
     public ResponseEntity getSubscription(@PathVariable Long subscriptionId) {
-        try {
-            Optional<Subscription> subscription = subscriptionService.getSubscription(subscriptionId);
-            if (subscription.isPresent()) {
-                return ResponseEntity.ok(subscription);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        Optional<Subscription> subscription = subscriptionService.getSubscription(subscriptionId);
+        if (subscription.isPresent()) {
+            return ResponseEntity.ok(subscription);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -60,15 +56,9 @@ public class SubscriptionController {
             @ApiResponse(code=401,message="Bad Request")
     })
     @PostMapping(value = "", produces = "application/json")
-    public ResponseEntity saveSubscription(@RequestBody Subscription subscription) {
-        try {
-            subscription = subscriptionService.saveSubscription(subscription);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new SubscriptionCreatedResponse(subscription.getId()));
-        } catch (InvalidSubscriptionException ise) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ise.errorMessages);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
+    public ResponseEntity saveSubscription(@RequestBody Subscription subscription) throws InvalidSubscriptionException {
+        subscription = subscriptionService.saveSubscription(subscription);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SubscriptionCreatedResponse(subscription.getId()));
     }
 
     @ApiOperation(value="update subscription",response=ResponseEntity.class)
@@ -79,15 +69,9 @@ public class SubscriptionController {
             @ApiResponse(code=401,message="Bad Request")
     })
     @PutMapping(value = "", produces = "application/json")
-    public ResponseEntity fullyUpdateSubscription(@RequestBody Subscription subscription) {
-        try {
-            subscription = subscriptionService.updateSubscription(subscription);
-            return ResponseEntity.ok(subscription);
-        } catch (InvalidSubscriptionException ise) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ise.errorMessages);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
+    public ResponseEntity fullyUpdateSubscription(@RequestBody Subscription subscription) throws InvalidSubscriptionException {
+        subscription = subscriptionService.updateSubscription(subscription);
+        return ResponseEntity.ok(subscription);
     }
 
     @ApiOperation(value="delete subscription",response=ResponseEntity.class)
@@ -99,18 +83,14 @@ public class SubscriptionController {
     })
     @DeleteMapping(value = "/{subscriptionId}", produces = "application/json")
     public ResponseEntity fullyUpdateSubscription(@PathVariable Long subscriptionId) {
-        try {
-            logger.info("Request for deleting subscription : " + subscriptionId);
-            if (subscriptionService.getSubscription(subscriptionId).isPresent()) {
-                subscriptionService.deleteSubscription(subscriptionId);
+        logger.info("Request for deleting subscription : " + subscriptionId);
+        if (subscriptionService.getSubscription(subscriptionId).isPresent()) {
+            subscriptionService.deleteSubscription(subscriptionId);
 
-                logger.info("Subscription : " + subscriptionId + " was deleted successfully");
-                return ResponseEntity.ok(new MessageResponse("The suscription was deleted successfully"));
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Subscription does not exist"));
-            }
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+            logger.info("Subscription : " + subscriptionId + " was deleted successfully");
+            return ResponseEntity.ok(new MessageResponse("The suscription was deleted successfully"));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Subscription does not exist"));
         }
     }
 

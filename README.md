@@ -10,6 +10,11 @@ For running the application is needed to have these technologies installed :
 
 To execute the application it's necessary to run the *run.sh* file.
 
+More endpoints were added, completing the Subscriptions CRUD API.
+
+To invoke them, it's necessary to pass the token in application.yml in the
+Authentication header (without the Bearer word).
+
 ### Architecture
 
 Here are the services that are part of the solution architecture :
